@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Document</title>
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css"
+			integrity="sha512-HK5fgLBL+xu6dm/Ii3z4xhlSUyZgTT9tuc/hSrtw6uzJOvgRr2a9jyxxT1ely+B+xFAmJKVSTbpM/CuL7qxO8w=="
+			crossorigin="anonymous"
+		/>
+		<script
+			src="https://code.jquery.com/jquery-3.6.3.min.js"
+			integrity="sha256-pvPw+upLPUjgMXY0G+8O0xUf+/Im1MZjXxxgOcBQBXU="
+			crossorigin="anonymous"
+		></script>
+		<style>
+			:root {
+				--primary-color: #ec1f55;
+				--text-color: #333;
+			}
+
+			* {
+				padding: 0;
+				margin: 0;
+				box-sizing: inherit;
+			}
+
+			body {
+				background-color: #f5f5f5;
+			}
+
+			html {
+				box-sizing: border-box;
+				font-family: 'Poppins', sans-serif;
+			}
+
+			.player {
+				position: relative;
+				max-width: 480px;
+				margin: 0 auto;
+			}
+
+			.player .icon-pause {
+				display: none;
+			}
+
+			.player.playing .icon-pause {
+				display: inline-block;
+			}
+
+			.player.playing .icon-play {
+				display: none;
+			}
+
+			.dashboard {
+				padding: 16px 16px 14px;
+				background-color: #fff;
+				position: fixed;
+				top: 0;
+				width: 100%;
+				max-width: 480px;
+				border-bottom: 1px solid #ebebeb;
+			}
+
+			/* HEADER */
+			header {
+				text-align: center;
+				margin-bottom: 10px;
+			}
+
+			header h4 {
+				color: var(--primary-color);
+				font-size: 12px;
+			}
+
+			header h2 {
+				color: var(--text-color);
+				font-size: 20px;
+			}
+
+			/* CD */
+			.cd {
+				display: flex;
+				margin: auto;
+				width: 200px;
+			}
+
+			.cd-thumb {
+				width: 100%;
+				padding-top: 100%;
+				border-radius: 50%;
+				background-color: #333;
+				background-size: cover;
+				margin: auto;
+			}
+
+			/* CONTROL */
+			.control {
+				display: flex;
+				align-items: center;
+				justify-content: space-around;
+				padding: 18px 0 8px 0;
+			}
+
+			.control .btn {
+				color: #666;
+				padding: 18px;
+				font-size: 18px;
+			}
+
+			.control .btn:active {
+				color: var(--primary-color);
+			}
+
+			.btn.active {
+				color: var(--primary-color);
+			}
+
+			.control .btn:hover {
+				cursor: pointer;
+			}
+			.control .btn-toggle-play {
+				width: 56px;
+				height: 56px;
+				border-radius: 50%;
+				font-size: 24px;
+				color: #fff;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				background-color: var(--primary-color);
+			}
+
+			.progress {
+				width: 100%;
+				-webkit-appearance: none;
+				height: 6px;
+				background: #d3d3d3;
+				outline: none;
+				opacity: 0.7;
+				-webkit-transition: 0.2s;
+				transition: opacity 0.2s;
+			}
+
+			.progress::-webkit-slider-thumb {
+				-webkit-appearance: none;
+				appearance: none;
+				width: 12px;
+				height: 6px;
+				background-color: var(--primary-color);
+				cursor: pointer;
+			}
+
+			/* PLAYLIST */
+			.playlist {
+				/* margin-top: 408px; */
+				padding: 12px;
+			}
+
+			.song {
+				display: flex;
+				align-items: center;
+				margin-bottom: 12px;
+				background-color: #fff;
+				padding: 8px 16px;
+				border-radius: 5px;
+				box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
+			}
+
+			.song:hover {
+				cursor: pointer;
+			}
+
+			.song.active {
+				background-color: var(--primary-color);
+			}
+
+			.song:active {
+				opacity: 0.8;
+			}
+
+			.song.active .option,
+			.song.active .author,
+			.song.active .title {
+				color: #fff;
+			}
+
+			.song .thumb {
+				width: 44px;
+				height: 44px;
+				border-radius: 50%;
+				background-size: cover;
+				margin: 0 8px;
+			}
+
+			.song .body {
+				flex: 1;
+				padding: 0 16px;
+			}
+
+			.song .title {
+				font-size: 18px;
+				color: var(--text-color);
+			}
+
+			.song .author {
+				font-size: 12px;
+				color: var(--text-color);
+			}
+
+			.song .option {
+				padding: 16px 8px;
+				color: #999;
+				font-size: 18px;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="player">
+			<!-- Dashboard -->
+			<div class="dashboard">
+				<!-- Header -->
+				<header>
+					<h4>Now playing:</h4>
+					<h2 class="song-name"></h2>
+				</header>
+
+				<!-- CD -->
+				<div class="cd">
+					<div class="cd-thumb"></div>
+				</div>
+
+				<!-- Control -->
+				<div class="control">
+					<div class="btn btn-repeat">
+						<i class="fas fa-redo"></i>
+					</div>
+					<div class="btn btn-prev">
+						<i class="fas fa-step-backward" id="prev"></i>
+					</div>
+					<div class="btn btn-toggle-play">
+						<i class="fas fa-pause icon-pause" id="pause"></i>
+						<i class="fas fa-play icon-play" id="playbtn"></i>
+					</div>
+					<div class="btn btn-new">
+						<i class="fas fa-step-forward" id="next"></i>
+					</div>
+					<div class="btn btn-random">
+						<i class="fas fa-random"></i>
+					</div>
+				</div>
+
+				<input id="progress" class="progress" type="range" value="0" step="0.1" min="0" max="100" />
+
+				<!-- Playlist -->
+				<div class="playlist"></div>
+			</div>
+		</div>
+		<script>
+			let sound = new Audio();
+			let songs = [
+				{
+					title: 'Thunder',
+					singer: 'Imagine Dragons',
+					src: './Imagine Dragons - Thunder.mp3',
+					img: './thunder.jpeg',
+				},
+				{
+					title: 'West Coast',
+					singer: 'Imagine Dragons',
+					src: './Imagine Dragons - West Coast.mp3',
+					img: './westcost.jpeg',
+				},
+				{
+					title: 'Demons',
+					singer: 'Imagine Dragons',
+					src: './Imagine Dragons - Demons.mp3',
+					img: './demon.jpeg',
+				},
+			];
+			let int = 0;
+			let isRepeat = false;
+			let isRandom = false;
+			$('.song-name').text(songs[int].title);
+			$('.cd-thumb').css('background-image', `url("${songs[int].img}")`);
+			$(function () {
+				songs.forEach((s, i) => {
+					document.querySelector('.playlist').innerHTML += `
+					<div class="song" onclick="pickSong(${i})">
+						<div class="thumb" style="background-image: url('${s.src}')"></div>
+						<div class="body">
+							<h3 class="title">${s.title}</h3>
+							<p class="author">${s.singer}</p>
+						</div>
+						<div class="option">
+							<i class="fas fa-ellipsis-h"></i>
+						</div>
+					</div>
+				`;
+				});
+			});
+
+			sound.onended = function () {
+				var songlist = $('.song').toArray();
+				songlist[int].classList.remove('active');
+				if (isRandom) {
+					let newInt = Math.floor(Math.random() * songs.length);
+					while (int == newInt) {
+						newInt = Math.floor(Math.random() * songs.length);
+					}
+					int = newInt;
+				}
+				if (int > songs.length - 1) {
+					int = 0;
+					if (isRepeat) playsong();
+					else $('.player').removeClass('playing');
+				} else playsong();
+			};
+			sound.ontimeupdate = function () {
+				$('#progress').val(Math.floor((this.currentTime / sound.duration) * 100));
+			};
+			$('#progress').change(function (e) {
+				sound.currentTime = (e.target.value / 100) * sound.duration;
+			});
+
+			$('.btn-repeat').click(() => {
+				isRepeat = true;
+				$('.btn-repeat').addClass('active');
+			});
+			$('#playbtn').click(() => playsong());
+			$('#pause').click(() => {
+				sound.pause();
+				$('.player').removeClass('playing');
+			});
+			$('#prev').click(() => {
+				var songlist = $('.song').toArray();
+				songlist[int].classList.remove('active');
+				if (int - 1 < 0) int = 1;
+				else int -= 1;
+				playsong();
+			});
+			$('#next').click(() => {
+				var songlist = $('.song').toArray();
+				songlist[int].classList.remove('active');
+				if (int + 1 > songs.length - 1) int = 0;
+				else int += 1;
+				playsong();
+			});
+			$('.btn-random').click(() => {
+				isRandom = true;
+				$('.btn-random').addClass('active');
+			});
+
+			function playsong() {
+				$('.cd-thumb').css('background-image', `url("${songs[int].img}")`);
+				$('.song-name').text(songs[int].title);
+				var songlist = $('.song').toArray();
+				songlist[int].classList.add('active');
+				sound.src = songs[int].src;
+				$('.player').addClass('playing');
+				sound.play();
+			}
+			function pickSong(index) {
+				var songlist = $('.song').toArray();
+				songlist[int].classList.remove('active');
+				int = index;
+				playsong();
+			}
+		</script>
+	</body>
+</html>
