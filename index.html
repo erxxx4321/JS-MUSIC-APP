@@ -306,19 +306,26 @@
 			sound.onended = function () {
 				var songlist = $('.song').toArray();
 				songlist[int].classList.remove('active');
+
 				if (isRandom) {
 					let newInt = Math.floor(Math.random() * songs.length);
 					while (int == newInt) {
 						newInt = Math.floor(Math.random() * songs.length);
 					}
 					int = newInt;
+					playsong();
+				} else if (isRepeat) {
+					int++;
+					if (int > songs.length - 1) int = 0;
+					playsong();
+				} else {
+					if (int > songs.length - 1) {
+						int = 0;
+						$('.player').removeClass('playing');
+					}
 				}
-				if (int > songs.length - 1) {
-					int = 0;
-					if (isRepeat) playsong();
-					else $('.player').removeClass('playing');
-				} else playsong();
 			};
+
 			sound.ontimeupdate = function () {
 				$('#progress').val(Math.floor((this.currentTime / sound.duration) * 100));
 			};
@@ -328,7 +335,7 @@
 
 			$('.btn-repeat').click(() => {
 				isRepeat = true;
-				$('.btn-repeat').addClass('active');
+				$('.btn-repeat').toggleClass('active');
 			});
 			$('#playbtn').click(() => playsong());
 			$('#pause').click(() => {
@@ -338,20 +345,29 @@
 			$('#prev').click(() => {
 				var songlist = $('.song').toArray();
 				songlist[int].classList.remove('active');
-				if (int - 1 < 0) int = 1;
-				else int -= 1;
+				// console.log(int);
+				int--;
+				if (int < 0) int = songs.length - 1;
 				playsong();
 			});
 			$('#next').click(() => {
 				var songlist = $('.song').toArray();
 				songlist[int].classList.remove('active');
-				if (int + 1 > songs.length - 1) int = 0;
-				else int += 1;
+				if (isRandom) {
+					let newInt = Math.floor(Math.random() * songs.length);
+					while (int == newInt) {
+						newInt = Math.floor(Math.random() * songs.length);
+					}
+					int = newInt;
+				} else {
+					int++;
+					if (int > songs.length - 1) int = 0;
+				}
 				playsong();
 			});
 			$('.btn-random').click(() => {
 				isRandom = true;
-				$('.btn-random').addClass('active');
+				$('.btn-random').toggleClass('active');
 			});
 
 			function playsong() {
