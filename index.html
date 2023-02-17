@@ -243,7 +243,7 @@
 					</div>
 					<div class="btn btn-toggle-play">
 						<i class="fas fa-pause icon-pause" id="pause"></i>
-						<i class="fas fa-play icon-play" id="playbtn"></i>
+						<i class="fas fa-play icon-play" id="playbtn" onclick="playsong()"></i>
 					</div>
 					<div class="btn btn-new">
 						<i class="fas fa-step-forward" id="next"></i>
@@ -284,6 +284,7 @@
 			let int = 0;
 			let isRepeat = false;
 			let isRandom = false;
+			sound.src = songs[int].src;
 			$('.song-name').text(songs[int].title);
 			$('.cd-thumb').css('background-image', `url("${songs[int].img}")`);
 			$(function () {
@@ -313,15 +314,20 @@
 						newInt = Math.floor(Math.random() * songs.length);
 					}
 					int = newInt;
+					sound.src = songs[int].src;
 					playsong();
 				} else if (isRepeat) {
 					int++;
 					if (int > songs.length - 1) int = 0;
+					sound.src = songs[int].src;
 					playsong();
 				} else {
+					int++;
 					if (int > songs.length - 1) {
 						int = 0;
 						$('.player').removeClass('playing');
+						$('.song-name').text('');
+						$('.cd-thumb').css('background-image', `url("")`);
 					}
 				}
 			};
@@ -334,10 +340,9 @@
 			});
 
 			$('.btn-repeat').click(() => {
-				isRepeat = true;
+				isRepeat = !isRepeat;
 				$('.btn-repeat').toggleClass('active');
 			});
-			$('#playbtn').click(() => playsong());
 			$('#pause').click(() => {
 				sound.pause();
 				$('.player').removeClass('playing');
@@ -345,9 +350,9 @@
 			$('#prev').click(() => {
 				var songlist = $('.song').toArray();
 				songlist[int].classList.remove('active');
-				// console.log(int);
 				int--;
 				if (int < 0) int = songs.length - 1;
+				sound.src = songs[int].src;
 				playsong();
 			});
 			$('#next').click(() => {
@@ -363,10 +368,11 @@
 					int++;
 					if (int > songs.length - 1) int = 0;
 				}
+				sound.src = songs[int].src;
 				playsong();
 			});
 			$('.btn-random').click(() => {
-				isRandom = true;
+				isRandom = !isRandom;
 				$('.btn-random').toggleClass('active');
 			});
 
@@ -375,14 +381,14 @@
 				$('.song-name').text(songs[int].title);
 				var songlist = $('.song').toArray();
 				songlist[int].classList.add('active');
-				sound.src = songs[int].src;
-				$('.player').addClass('playing');
 				sound.play();
+				$('.player').addClass('playing');
 			}
 			function pickSong(index) {
 				var songlist = $('.song').toArray();
 				songlist[int].classList.remove('active');
 				int = index;
+				sound.src = songs[int].src;
 				playsong();
 			}
 		</script>
