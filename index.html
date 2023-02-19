@@ -322,13 +322,11 @@
 					sound.src = songs[int].src;
 					playsong();
 				} else {
-					int++;
-					if (int > songs.length - 1) {
-						int = 0;
-						$('.player').removeClass('playing');
-						$('.song-name').text('');
-						$('.cd-thumb').css('background-image', `url("")`);
-					}
+					int = 0;
+					sound.src = songs[int].src;
+					$('.player').removeClass('playing');
+					$('.song-name').text('');
+					$('.cd-thumb').css('background-image', `url("")`);
 				}
 			};
 
